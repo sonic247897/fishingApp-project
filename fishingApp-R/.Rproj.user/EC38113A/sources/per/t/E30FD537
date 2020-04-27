@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1586092684126.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3762674178",
+    "id" : "E30FD537",
+    "lastKnownWriteTime" : 1586093113,
+    "last_content_update" : 1586093113810,
+    "path" : "~/fishingApp/encoding2.R",
+    "project_path" : "encoding2.R",
+    "properties" : {
+        "cursorPosition" : "11,27",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
