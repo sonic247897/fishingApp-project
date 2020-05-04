@@ -20,6 +20,8 @@
         <activity android:name=".mappoint.Point1"/>
         <activity android:name=".mappoint.Point2" />
         <activity android:name=".nofish.activity.NoFishData" />
+        <activity android:name=".mappoint.ReadActivity" />
+        <activity android:name=".map.weather"/>
         <activity android:name=".nofish.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

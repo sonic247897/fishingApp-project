@@ -14,16 +14,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import com.project.fishbegin.R;
-import com.project.fishbegin.map.map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class Point2 extends AppCompatActivity {
-    public static final String ROOT_DIR = "/data/data/org.tensorflow.demo/databases/";
     DBHandler handler;
     // 화면 하나당 프래그먼트 1개씩 필요
     TextView categoryView;
@@ -199,6 +196,7 @@ public class Point2 extends AppCompatActivity {
                 new int[]{android.R.id.text1, android.R.id.text2}
         );
         listview.setAdapter(adapter);
+        listview.setEnabled(true);
         listview.setOnItemClickListener(new ListItemClick());
     }
 
@@ -231,6 +229,7 @@ public class Point2 extends AppCompatActivity {
                 new int[]{android.R.id.text1, android.R.id.text2}
         );
         listview.setAdapter(adapter);
+        listview.setEnabled(true);
         listview.setOnItemClickListener(new ListItemClick());
     }
 
@@ -263,6 +262,7 @@ public class Point2 extends AppCompatActivity {
                 new int[]{android.R.id.text1, android.R.id.text2}
         );
         listview.setAdapter(adapter);
+        listview.setEnabled(true);
         listview.setOnItemClickListener(new ListItemClick());
     }
 
@@ -295,6 +295,7 @@ public class Point2 extends AppCompatActivity {
                 new int[]{android.R.id.text1, android.R.id.text2}
         );
         listview.setAdapter(adapter);
+        listview.setEnabled(true);
         listview.setOnItemClickListener(new ListItemClick());
     }
 
@@ -347,7 +348,6 @@ public class Point2 extends AppCompatActivity {
 		startActivity(intent);*//*
     }*/
 }
-
 
 
 

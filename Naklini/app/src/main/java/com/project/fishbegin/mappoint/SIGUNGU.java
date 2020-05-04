@@ -32,14 +32,14 @@ public class SIGUNGU implements Parcelable {
         return 0;
     }
 
-    public static final Creator<SIGUNGU> CREATOR = new Creator<SIGUNGU>() {
+    public static final Creator<com.project.fishbegin.mappoint.SIGUNGU> CREATOR = new Creator<com.project.fishbegin.mappoint.SIGUNGU>() {
         @Override
-        public SIGUNGU createFromParcel(Parcel in) {
+        public com.project.fishbegin.mappoint.SIGUNGU createFromParcel(Parcel in) {
             return new SIGUNGU(in);
         }
 
         @Override
-        public SIGUNGU[] newArray(int size) {
+        public com.project.fishbegin.mappoint.SIGUNGU[] newArray(int size) {
             return new SIGUNGU[size];
         }
     };

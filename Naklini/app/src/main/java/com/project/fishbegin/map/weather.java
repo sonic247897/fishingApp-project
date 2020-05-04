@@ -64,7 +64,7 @@ public class weather extends AppCompatActivity {
             String nx = "61"; //
             String ny = "125"; //
             String baseDate = split[0];
-            String baseTime = "0500"; //시간  설정
+            String baseTime = basetime(split[1]); //시간  설정
             Log.d("time","time"+baseTime);
             String serviceKey = "bFLjSVwZpB%2BomeIbURaEI3jRNcEQ9j9jhqNnd2bDYYvybfq8qGRrA5zrU19E1b2w7TVtaw%2FZ%2BJhA5wZYDewN3g%3D%3D";
             String urlStr = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?" + "serviceKey="
@@ -157,5 +157,31 @@ public class weather extends AppCompatActivity {
         mav.addObject("today", today);
         mav.setViewName("weather");*/
         return "";
+    }
+
+    public String basetime(String split){
+        //Base_time : 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회)
+        if (Integer.parseInt(split) >= 23){
+            split = "2300";
+        }else if (Integer.parseInt(split) >= 0 && Integer.parseInt(split) < 2){
+            split = "2300";
+        }else if (Integer.parseInt(split) >= 2 && Integer.parseInt(split) < 5){
+            split = "0200";
+        }else if (Integer.parseInt(split) >= 5 && Integer.parseInt(split) < 8){
+            split = "0500";
+        }else if (Integer.parseInt(split) >= 8 && Integer.parseInt(split) < 11){
+            split = "0800";
+        }else if (Integer.parseInt(split) >= 11 && Integer.parseInt(split) < 14){
+            split = "1100";
+        }else if (Integer.parseInt(split) >= 14 && Integer.parseInt(split) < 17){
+            split = "1400";
+        }else if (Integer.parseInt(split) >= 17 && Integer.parseInt(split) < 20){
+            split = "1700";
+        }else if (Integer.parseInt(split) >= 20 && Integer.parseInt(split) < 23){
+            split = "2000";
+        }
+
+        Log.d("data",split+"");
+        return split;
     }
 }

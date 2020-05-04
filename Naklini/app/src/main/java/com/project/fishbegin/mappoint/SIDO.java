@@ -17,14 +17,14 @@ public class SIDO implements Parcelable {
         SIDO = in.readString();
     }
 
-    public static final Creator<SIDO> CREATOR = new Creator<SIDO>() {
+    public static final Creator<com.project.fishbegin.mappoint.SIDO> CREATOR = new Creator<com.project.fishbegin.mappoint.SIDO>() {
         @Override
-        public SIDO createFromParcel(Parcel in) {
+        public com.project.fishbegin.mappoint.SIDO createFromParcel(Parcel in) {
             return new SIDO(in);
         }
 
         @Override
-        public SIDO[] newArray(int size) {
+        public com.project.fishbegin.mappoint.SIDO[] newArray(int size) {
             return new SIDO[size];
         }
     };

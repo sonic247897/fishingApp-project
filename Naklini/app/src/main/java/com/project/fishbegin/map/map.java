@@ -8,7 +8,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -42,11 +43,12 @@ import com.project.fishbegin.map.db.Freshwater;
 import com.project.fishbegin.map.db.Onboard;
 import com.project.fishbegin.map.db.Rock;
 import com.project.fishbegin.map.db.Sea;
-import com.project.fishbegin.mappoint.FreshWater;
 import com.project.fishbegin.mappoint.OnBoard;
 import com.project.fishbegin.mappoint.Point1;
+import com.project.fishbegin.mappoint.ReadActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -54,7 +56,6 @@ import java.util.List;
 public class map extends AppCompatActivity implements OnMapReadyCallback {
     // 인텐트에 보낼 리퀘스트 코드(100+i)
     public static final int CALL_POINT_CODE = 1001;
-
     String[] permission_list={
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -68,7 +69,8 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
     List<Sea> seaList;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
-    Spinner dropdown1;
+    Spinner spinner;
+    List<String> spinnerlist;
     Button listBtn;
     Intent intent;
 
@@ -77,9 +79,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         drawerLayout = findViewById(R.id.main_drawer);
-        dropdown1 = findViewById(R.id.dropdown1);
-        listBtn = findViewById(R.id.button3);
-
+        listBtn = findViewById(R.id.button2);
         //액션바에 버튼 설정 - 버튼을 선택하면 NavigationView가 display
         //                    버튼을 다시 선택하면 NavigationView가 화면에서 사라지도록 설정
         toggle = new ActionBarDrawerToggle(this,
@@ -99,7 +99,6 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
                 callPoint1();
             }
         });
-
     }
 
     public void callPoint1(){
@@ -109,7 +108,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         startActivityForResult(intent, CALL_POINT_CODE);
     }
 
-   @Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         String returnCategory = "";
@@ -117,15 +116,13 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
             if(resultCode==RESULT_OK){
                 // @서로 넘길때 OnBoard(mappoint)객체를 통째로 넘겨주고 onboard와 _id로 연결
                 returnCategory = intent.getStringExtra("returnCategory");
-                Log.d("intent", returnCategory);
                 // 카테고리 목록 다 부르고 내가 선택한 좌표, 위치로 zoom
                 switch(returnCategory){
                     case "Onboard":
                         //onboard();
                         OnBoard point1 = (OnBoard)intent.getParcelableExtra("Parcelable");
-                        Log.d("intent", returnCategory+", "+point1);
                         LatLng myloc1 = new LatLng(Double.parseDouble(point1.latitude),Double.parseDouble(point1.longitude));
-                        pointZoom(myloc1);
+                        pointZoom(point1.point_nm,myloc1);
                         break;
                     case "Freshwater":
                         com.project.fishbegin.mappoint.FreshWater point2 =
@@ -139,7 +136,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
                         com.project.fishbegin.mappoint.Rock point3 =
                                 (com.project.fishbegin.mappoint.Rock) intent.getParcelableExtra("Parcelable");
                         LatLng myloc3 = new LatLng(Double.parseDouble(point3.latitude),Double.parseDouble(point3.longitude));
-                        pointZoom(myloc3);
+                        pointZoom(point3.point_nm, myloc3);
                         break;
                     case "Sea":
                         com.project.fishbegin.mappoint.Sea point4 =
@@ -154,12 +151,17 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    public void pointZoom(LatLng myloc){
-        CameraPosition.Builder builder = new CameraPosition.Builder();
-        builder.target(myloc);
-        builder.zoom(15);
-        CameraPosition position = builder.build();
-        map.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+    public void pointZoom(String name, LatLng myloc){
+        map.clear();
+        // 마커 생성
+        MarkerOptions mOptions2 = new MarkerOptions();
+        mOptions2.title(name);
+        //mOptions2.snippet(address);
+        mOptions2.position(myloc);
+        // 마커 추가
+        map.addMarker(mOptions2);
+        // 해당 좌표로 화면 줌
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc, 15));
     }
 
     public void pointZoom2(String name, String address){
@@ -185,15 +187,8 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
 
             // 좌표(위도, 경도) 생성
             LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-            // 마커 생성
-            MarkerOptions mOptions2 = new MarkerOptions();
-            mOptions2.title(name);
-            mOptions2.snippet(address_);
-            mOptions2.position(point);
-            // 마커 추가
-            map.addMarker(mOptions2);
             // 줌
-            pointZoom(point);
+            pointZoom(name, point);
         }else{
             Log.d("result","검색 결과 없음");
         }
@@ -202,10 +197,41 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
 
     // TODO: =============================================================================================
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.top_navi,menu);
+
+        spinnerlist = new ArrayList<>();
+        spinnerlist.add("낚시 포인트별 전체 조회");
+        spinnerlist.add("Onboard");
+        spinnerlist.add("Freshwater");
+        spinnerlist.add("Rock");
+        spinnerlist.add("Sea");
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_dropdown_item_1line,spinnerlist);
+
+        spinner = findViewById(R.id.dropdown);
+        spinner.setAdapter(arrayAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 1){
+                    onboard();
+                }else if (position == 2){
+                    fresh();
+                }else if (position == 3){
+                    rock();
+                }else if (position == 4){
+                    sea();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         MenuItem search_item = menu.findItem(R.id.Item0);
         SearchView searchView = (SearchView) search_item.getActionView();
@@ -231,21 +257,6 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (toggle.onOptionsItemSelected(item)){
 
-        }
-        int id = item.getItemId();
-        switch (id){
-            case R.id.Item1:
-                onboard();
-                break;
-            case R.id.Item2:
-                fresh();
-                break;
-            case R.id.Item3:
-                rock();
-                break;
-            case R.id.Item4:
-                sea();
-                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -278,22 +289,6 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
             getMyLocation();
         }
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng point) {
-                MarkerOptions mOptions = new MarkerOptions();
-                // 마커 타이틀
-                mOptions.title("마커 좌표");
-                Double latitude = point.latitude; // 위도
-                Double longitude = point.longitude; // 경도
-                // 마커의 스니펫(간단한 텍스트) 설정
-                mOptions.snippet(latitude.toString() + ", " + longitude.toString());
-                // LatLng: 위도 경도 쌍을 나타냄
-                mOptions.position(new LatLng(latitude, longitude));
-                // 마커(핀) 추가
-                map.addMarker(mOptions);
-            }
-        });
     }
 
     public void search(String query){
@@ -421,8 +416,8 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         mDbHelper.close();
 
 
-        String latitude = onboardList.get(1).getLatitude(); // 위도
-        String longitude = onboardList.get(1).getLongitude(); // 경도
+        //String latitude = onboardList.get(1).getLatitude(); // 위도
+        //String longitude = onboardList.get(1).getLongitude(); // 경도
 
         for (int i=1; i<onboardList.size(); i++){
             String latitude2 = onboardList.get(i).getLatitude();
@@ -441,7 +436,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
             //map.moveCamera(CameraUpdateFactory.newLatLngZoom(point[i], 15));
         }
 
-        // 좌표(위도, 경도) 생성
+        /*// 좌표(위도, 경도) 생성
         LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
         // 마커 생성
         MarkerOptions mOptions2 = new MarkerOptions();
@@ -451,7 +446,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         // 마커 추가
         map.addMarker(mOptions2);
         // 해당 좌표로 화면 줌
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));*/
     }
 
     public void rock(){
@@ -467,8 +462,8 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         mDbHelper.close();
 
 
-        String latitude = rockList.get(1).getLatitude(); // 위도
-        String longitude = rockList.get(1).getLongitude(); // 경도
+        //String latitude = rockList.get(1).getLatitude(); // 위도
+        //String longitude = rockList.get(1).getLongitude(); // 경도
 
         for (int i=1; i<rockList.size(); i++){
             String latitude2 = rockList.get(i).getLatitude();
@@ -487,7 +482,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
             //map.moveCamera(CameraUpdateFactory.newLatLngZoom(point[i], 15));
         }
 
-        // 좌표(위도, 경도) 생성
+        /*// 좌표(위도, 경도) 생성
         LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
         // 마커 생성
         MarkerOptions mOptions2 = new MarkerOptions();
@@ -497,7 +492,7 @@ public class map extends AppCompatActivity implements OnMapReadyCallback {
         // 마커 추가
         map.addMarker(mOptions2);
         // 해당 좌표로 화면 줌
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));*/
     }
 
     public void fresh(){
